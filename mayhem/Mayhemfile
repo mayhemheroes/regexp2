@@ -1,0 +1,4 @@
+project: regexp2
+target: regexp2-syntax-fuzz
+cmds:
+  - cmd: ./syntax-fuzz.libfuzzer
