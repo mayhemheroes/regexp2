@@ -1,13 +1,11 @@
-FROM fuzzers/go-fuzz:1.2.0 as builder
+FROM golang:1.23 AS builder
 
-ARG project='regexp2'
-ARG fuzzTargetPath='syntax'
-ARG fuzzTarget='syntax-fuzz'
+ENV GOTOOLCHAIN=auto
 
-ADD . ${project}
-WORKDIR ${project}
-RUN GO_ENABLED=0 go-fuzz-build -libfuzzer -o /${fuzzTarget}.a ./${fuzzTargetPath}
-RUN clang -fsanitize=fuzzer /${fuzzTarget}.a -o /${fuzzTarget}.libfuzzer
+WORKDIR /src
+ADD . .
 
-FROM ubuntu:20.04
+RUN go test -c ./syntax -o /syntax-fuzz.libfuzzer
+
+FROM ubuntu:22.04
 COPY --from=builder /syntax-fuzz.libfuzzer /
